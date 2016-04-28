@@ -6,14 +6,16 @@ output: html_document
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # For data manipulation and visualization
-#install.packages("mosaic")
 suppressPackageStartupMessages(library(mosaic))
+suppressPackageStartupMessages(library(spdep))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(knitr))
 # For US county and state maps
+suppressPackageStartupMessages(library(sp))
+suppressPackageStartupMessages(library(rgeos))
 suppressPackageStartupMessages(library(maps))
 # For loading in shapefiles
 suppressPackageStartupMessages(library(rgdal))
@@ -27,9 +29,9 @@ suppressPackageStartupMessages(library(leaflet))
 Please indicate
 
 * Who you collaborated with: talked to Christian about data and leaflet
-* Roughly how much time you spent on this HW: ~6 hours
-* What gave you the most trouble:
-* Any comments you have: 
+* Roughly how much time you spent on this HW: ~9 hours
+* What gave you the most trouble: 1.B Spatial Autocorrelation
+* Any comments you have: Uggggh
 
 
 ## Question 1:
@@ -111,18 +113,32 @@ g+colScale
 
 ```{r, fig.width=12, fig.height=6}
 
-#Spatial Autocorrelation: Moran's I
-county_geo_data
-# Run the next bit of code a few times to convince yourselves of this fact.
-county_geo_data.dists <- as.matrix(dist(cbind(county_geo_data$lon, county_geo_data$lat)))
-
-ozone.dists.inv <- 1/ozone.dists
-diag(ozone.dists.inv) <- 0
-# We then compute Moran's I using Y_i = noise.  Look at the statistic and 
-# p-value for multiple runs of the following two lines. Again, run this a few 
-# times to see how the p-value behaves.
-noise <- runif(n, min=0, max=1)
-moran.test(noise, PDX_weights)
+# I swear I tried, but now I give up. I don't understand how to work with polygons well enough to do Moran's I
+# #Spatial Autocorrelation: Moran's I
+# 
+# vote_coords <- as.data.frame(cbind(county_geo_data$long, county_geo_data$lat))
+# 
+# vote_sdf <- SpatialPointsDataFrame(coords = vote_coords, data = as.data.frame(county_geo_data),
+#                                proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+# 
+# 
+# #coord <- coordinates(shapefile)
+# 
+# # Get neighbor information
+# list <- lapply(1:2,function(i)readWKT(county_geo_data[i,1],id=i))
+# sp   <- SpatialPolygons(lapply(list,function(sp)sp@polygons[[1]]))
+# library(spdep)
+# poly2nb(sp)
+# 
+# (lapply(list,function(sp)sp@polygons[[1]]))
+# neighbor <- poly2nb(vote_sdf, queen = FALSE)
+# summary(neighbor)
+# 
+# # Get weights as defined in slides.  "B" indicates basic weights.
+# weights <- nb2listw(neighbor, style = "B")
+# 
+# 
+# moran.test(vote_sdf@data$PBUSH, weights)
 
 
 ```
@@ -137,10 +153,6 @@ Here is some starter code:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #I'm not sure why these don't/rarely knit, they compile fine for me
-
-shapefile_name <- paste(getwd(), "/VT_census_tracts/tl_2015_50_tract.shp", sep="")
-VT <- readOGR(shapefile_name, layer = "tl_2015_50_tract", verbose = FALSE)
-
 #import, select, rename 
 vt_census <- read.csv("data/VT_census_tract.csv", header=TRUE) %>% 
   tbl_df()
