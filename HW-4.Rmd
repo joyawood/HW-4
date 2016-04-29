@@ -31,7 +31,7 @@ Please indicate
 * Who you collaborated with: talked to Christian about data and leaflet
 * Roughly how much time you spent on this HW: ~9 hours
 * What gave you the most trouble: 1.B Spatial Autocorrelation
-* Any comments you have: Uggggh
+* Any comments you have: Uggggh. Really struggled.
 
 
 ## Question 1:
@@ -154,6 +154,9 @@ Here is some starter code:
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #I'm not sure why these don't/rarely knit, they compile fine for me
 #import, select, rename 
+shapefile_name <- paste(getwd(), "/VT_census_tracts/tl_2015_50_tract.shp", sep="")
+VT <- readOGR(shapefile_name, layer = "tl_2015_50_tract", verbose = FALSE)
+
 vt_census <- read.csv("data/VT_census_tract.csv", header=TRUE) %>% 
   tbl_df()
 
