@@ -92,6 +92,7 @@ myColors <- c("#1B338B","#8B1B33","#FFFFFF")
 names(myColors) <- levels(county_geo_data$party)
 colScale <- scale_fill_manual(name = "party",values = myColors, labels=c("Democrat", "Republican", "Split"))
 
+
 #base map
 g <- ggplot(data=NULL) +
 geom_polygon(data=county_geo_data, aes(x=long, y=lat, group=group, fill=party)) +
@@ -106,44 +107,39 @@ labs(title = "Prefered Party By County in the 2000 Election", x = "longitude", y
 #add color
 g+colScale
 
+#gradient map
+g2 <- ggplot(data=NULL) +
+geom_polygon(data=county_geo_data, aes(x=long, y=lat, group=group, fill=PBUSH)) +
+geom_path(data=county_geo_data, aes(x=long, y=lat, group=group), col="grey", size=0.1) +
+geom_path(data=US_state, aes(x=long, y=lat, group=group), col="black", size=0.2) +
+coord_map() +
+guides(fill=guide_legend(title="Percent Republican"))+
+labs(title = "Prefered Party By County in the 2000 Election", x = "longitude", y = "latitude")+
+  theme_map()+
+  theme(legend.background = element_rect(fill="gray90", size=.5))
+
+colScale2 <- scale_fill_gradientn(colours = c("#1B338B","#FFFFFF","#8B1B33"))
+
+#add color
+g2+colScale2
+
 ```
 
 
 ### Write-Up
 
 ```{r, fig.width=12, fig.height=6}
+instate_variance <- county_geo_data %>% 
+  mutate(county = paste(subregion, " ", region)) %>% 
+  select(region, county, PBUSH) %>% 
+  subset(!duplicated(county)) %>% 
+  group_by(region) %>% 
+  summarise(stateVar = sd(PBUSH)) 
 
-# I swear I tried, but now I give up. I don't understand how to work with polygons well enough to do Moran's I
-# #Spatial Autocorrelation: Moran's I
-# 
-# vote_coords <- as.data.frame(cbind(county_geo_data$long, county_geo_data$lat))
-# 
-# vote_sdf <- SpatialPointsDataFrame(coords = vote_coords, data = as.data.frame(county_geo_data),
-#                                proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
-# 
-# 
-# #coord <- coordinates(shapefile)
-# 
-# # Get neighbor information
-# list <- lapply(1:2,function(i)readWKT(county_geo_data[i,1],id=i))
-# sp   <- SpatialPolygons(lapply(list,function(sp)sp@polygons[[1]]))
-# library(spdep)
-# poly2nb(sp)
-# 
-# (lapply(list,function(sp)sp@polygons[[1]]))
-# neighbor <- poly2nb(vote_sdf, queen = FALSE)
-# summary(neighbor)
-# 
-# # Get weights as defined in slides.  "B" indicates basic weights.
-# weights <- nb2listw(neighbor, style = "B")
-# 
-# 
-# moran.test(vote_sdf@data$PBUSH, weights)
-
-
+instate_variance %>%   arrange(desc(stateVar))
 ```
 
-
+A quick look at the standard deviation of county votes by state gives us some insight on how split the vote is in each state. New Mexico is the state with the highest standard deviation, its counties differ significantly in their voting patterns. It's also known to be a swing state. So is Colorado, 5th in voting diversity. Swing states are often racially diverse, and racial diversity may also play into voting diversity by county. Vermont, on the opposite extreme, is relatively homogenous in its vote, it is the fifth "most consistant" voting state. Most of New England follows this trend, perhap also hinting that racial diversity may be correlated to diversity in voting patterns.
 
 ## Question 2:
 
