@@ -128,7 +128,7 @@ g2+colScale2
 
 ### Write-Up
 
-```{r, fig.width=12, fig.height=6}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 instate_variance <- county_geo_data %>% 
   mutate(county = paste(subregion, " ", region)) %>% 
   select(region, county, PBUSH) %>% 
