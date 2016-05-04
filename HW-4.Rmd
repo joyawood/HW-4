@@ -136,7 +136,22 @@ instate_variance <- county_geo_data %>%
   group_by(region) %>% 
   summarise(stateVar = sd(PBUSH)) 
 
-kable(instate_variance %>%   arrange(desc(stateVar)))
+county_geo_data<- left_join(county_geo_data,instate_variance)
+
+gvar <- ggplot(data=NULL) +
+geom_polygon(data=county_geo_data, aes(x=long, y=lat, group=group, fill=stateVar)) +
+geom_path(data=US_state, aes(x=long, y=lat, group=group), col="black", size=0.2) +
+coord_map() +
+guides(fill=guide_legend(title="SD by county"))+
+labs(title = "Diversity in Voting Patterns by State", x = "longitude", y = "latitude")+
+  theme_map()+
+  theme(legend.background = element_rect(fill="gray90", size=.5))
+
+colScale3 <- scale_fill_gradientn(colours = c("white", "#2c7fb8", "black" ))
+
+#add color
+gvar+colScale3
+
 ```
 
 A quick look at the standard deviation of county votes by state gives us some insight on how split the vote is in each state. New Mexico is the state with the highest standard deviation, its counties differ significantly in their voting patterns. It's also known to be a swing state. So is Colorado, 5th in voting diversity. Swing states are often racially diverse, and racial diversity may also play into voting diversity by county. Vermont, on the opposite extreme, is relatively homogenous in its vote, it is the fifth "most consistant" voting state. Most of New England follows this trend, perhap also hinting that racial diversity may be correlated to diversity in voting patterns.
