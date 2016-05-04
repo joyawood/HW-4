@@ -136,7 +136,7 @@ instate_variance <- county_geo_data %>%
   group_by(region) %>% 
   summarise(stateVar = sd(PBUSH)) 
 
-instate_variance %>%   arrange(desc(stateVar))
+kable(instate_variance %>%   arrange(desc(stateVar)))
 ```
 
 A quick look at the standard deviation of county votes by state gives us some insight on how split the vote is in each state. New Mexico is the state with the highest standard deviation, its counties differ significantly in their voting patterns. It's also known to be a swing state. So is Colorado, 5th in voting diversity. Swing states are often racially diverse, and racial diversity may also play into voting diversity by county. Vermont, on the opposite extreme, is relatively homogenous in its vote, it is the fifth "most consistant" voting state. Most of New England follows this trend, perhap also hinting that racial diversity may be correlated to diversity in voting patterns.
